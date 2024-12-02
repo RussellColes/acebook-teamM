@@ -13,6 +13,14 @@ async function upload(req, res) {
     const user_id = req.user_id
     const photos = await Photo.find({ user_id: user_id })
     if (photos.length !== 0) {
+      const pathParts = __dirname.split(path.sep);
+      const apiIndex = pathParts.indexOf('api');
+      const apiPath = pathParts.slice(0, apiIndex + 1).join(path.sep);
+      console.log(apiPath);
+      console.log(`${apiPath}/${photos[0].photoFilePath}`);
+      fs.unlink(`${apiPath}/${photos[0].photoFilePath}`, (err) => {
+        console.log(err);
+      })
       const result = await Photo.findByIdAndDelete(photos[0]._id)
     }
   
