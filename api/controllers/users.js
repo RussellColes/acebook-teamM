@@ -36,16 +36,9 @@ async function getUserProfile(req, res) {
 
 
 async function getAnyUserProfile(req, res) {
-  console.log("req.params.username is ----------->", req.params.username)
   const currentUser = await User.find({ _id: req.user_id });
   const queryUser = await User.find({ username: req.params.username });
-
-  // console.log("My details", currentUser[0].username);
-  // console.log("Query details", queryUser[0].username);
-  // console.log((currentUser[0].username == queryUser[0].username))
-  // console.log(queryUser[0]._id.toString())
   const photo = await Photo.find({ user_id: queryUser[0]._id.toString() })
-  // console.log("My photo is here --------->", photo);
   let filePath
   if (photo.length === 0) {
     filePath = "uploads/default_photo.webp"
@@ -82,6 +75,21 @@ async function checkUsername(req, res) {
     }
 }
 
+async function getMyUsername(req, res) {
+  const currentUser = await User.find({ _id: req.user_id });
+  console.log(currentUser);
+  const token = generateToken(req.user_id);
+
+  const returnUserData = {
+    firstName: currentUser[0].firstName,
+    lastName: currentUser[0].lastName,
+    user_id: currentUser[0]._id,
+    username: currentUser[0].username,
+  }
+  return res.json(returnUserData);
+
+}
+
 async function isUnique(username) {
   const userArray = await User.find({username: username});
   return (userArray.length === 0)
@@ -91,7 +99,8 @@ const UsersController = {
   create: create,
   getUserProfile: getUserProfile,
   checkUsername: checkUsername,
-  getAnyUserProfile: getAnyUserProfile
+  getAnyUserProfile: getAnyUserProfile,
+  getMyUsername: getMyUsername,
 };
 
 module.exports = UsersController;
